@@ -119,6 +119,7 @@ class Sellers(models.Model):
     seller_id = models.IntegerField(primary_key=True)
     seller_name = models.CharField(max_length=100)
     email = models.CharField(unique=True, max_length=100)
+    password = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.CharField(max_length=150, blank=True, null=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1, blank=True, null=True)

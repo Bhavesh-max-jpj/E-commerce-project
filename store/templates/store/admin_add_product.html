@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Product (Admin)</title>
+</head>
+<body>
+
+<h1>Add Product</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    <label>Product ID</label><br>
+    <input type="number" name="product_id" required><br><br>
+
+    <label>Product Title</label><br>
+    <input type="text" name="product_title" required><br><br>
+
+    <label>Seller ID (optional)</label><br>
+    <input type="number" name="seller_id"><br><br>
+
+    <label>Brand</label><br>
+    <input type="text" name="brand"><br><br>
+
+    <label>Category</label><br>
+    <input type="text" name="category"><br><br>
+
+    <label>Price</label><br>
+    <input type="number" step="0.01" name="price"><br><br>
+
+    <label>Stock Quantity</label><br>
+    <input type="number" name="stock_quantity"><br><br>
+
+    <button type="submit">Add</button>
+</form>
+
+<a href="/adminpanel/products/">Back to Products</a>
+
+</body>
+</html>

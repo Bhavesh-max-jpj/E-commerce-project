@@ -1,67 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Cart</title>
+{% extends 'store/base.html' %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-        }
+{% block title %}My Cart{% endblock %}
 
-        .container {
-            width: 85%;
-            margin: 40px auto;
-        }
+{% block content %}
 
-        .item {
-            background: white;
-            margin-bottom: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            border-radius: 8px;
-        }
-
-        .item img {
-            width: 120px;
-            height: 120px;
-            object-fit: contain;
-        }
-
-        .details {
-            flex: 1;
-        }
-
-        .price {
-            font-weight: bold;
-        }
-
-        .total {
-            background: white;
-            padding: 25px;
-            text-align: right;
-            font-size: 22px;
-            font-weight: bold;
-        }
-
-        .checkout {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 12px 25px;
-            background: black;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-
-<body>
+<style>
+    .container { width:85%; margin:40px auto }
+    .item { background:white; margin-bottom:15px; padding:20px; display:flex; align-items:center; gap:25px; border-radius:8px }
+    .item img { width:120px; height:120px; object-fit:contain }
+    .details { flex:1 }
+    .price { font-weight:bold }
+    .total { background:white; padding:25px; text-align:right; font-size:22px; font-weight:bold }
+    .checkout { display:inline-block; margin-top:15px; padding:12px 25px; background:black; color:white; text-decoration:none; border-radius:5px }
+    .back-link { display:inline-block; margin-bottom:16px; padding:8px 12px; background:#eee; color:#222; text-decoration:none; border-radius:4px }
+    .product-link { color:#111; text-decoration:none }
+</style>
 
 <div class="container">
+
+    <a href="/products/" class="back-link">← Back to Products</a>
 
     <h1>My Cart</h1>
 
@@ -72,14 +29,13 @@
         <div class="item">
 
             {% if item.product.image_url %}
-                <img src="{{ item.product.image_url }}"
-                     alt="{{ item.product.product_title }}">
+                <img src="{{ item.product.image_url }}" alt="{{ item.product.product_title }}">
             {% endif %}
 
             <div class="details">
 
                 <h2>
-                    {{ item.product.product_title }}
+                    <a class="product-link" href="{% url 'product_detail' item.product.product_id %}">{{ item.product.product_title }}</a>
                 </h2>
 
                 <p>
@@ -92,32 +48,19 @@
 
                 <div>
 
-    <strong>Quantity:</strong>
+                    <strong>Quantity:</strong>
 
-    <a href="{% url 'decrease_cart' item.cart_id %}">
-        −
-    </a>
+                    <a href="{% url 'decrease_cart' item.cart_id %}">−</a>
 
-    <span style="margin: 0 10px;">
-        {{ item.quantity }}
-    </span>
+                    <span style="margin: 0 10px;">{{ item.quantity }}</span>
 
-    <a href="{% url 'increase_cart' item.cart_id %}">
-        +
-    </a>
+                    <a href="{% url 'increase_cart' item.cart_id %}">+</a>
 
-</div>
+                </div>
 
-<p>
-    <a href="{% url 'remove_from_cart' item.cart_id %}">
-        Remove
-    </a>
-</p>
+                <p><a href="{% url 'remove_from_cart' item.cart_id %}">Remove</a></p>
 
-                <p>
-                    Subtotal:
-                    ₹{% widthratio item.product.price 1 item.quantity %}
-                </p>
+                <p>Subtotal: ₹{% widthratio item.product.price 1 item.quantity %}</p>
 
             </div>
 
@@ -131,9 +74,7 @@
 
             <br>
 
-            <a href="{% url 'checkout' %}" class="checkout">
-    Checkout
-</a>
+            <a href="{% url 'checkout' %}" class="checkout">Checkout</a>
         </div>
 
     {% else %}
@@ -144,5 +85,4 @@
 
 </div>
 
-</body>
-</html>
+{% endblock %}

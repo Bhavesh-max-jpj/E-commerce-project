@@ -1,0 +1,18 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Home - Online Shopping{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Online Shopping Demo</h1>
+
+<p>Use the links in the header to login as a Customer, Seller, or Admin.</p>
+
+<div style="margin-top:20px">
+    <a href="/products/">Browse Products</a>
+    &nbsp;|&nbsp;
+    <a href="/seller/product/add/">Add Product (Seller)</a>
+    &nbsp;|&nbsp;
+    <a href="/adminpanel/dashboard/">Admin Dashboard</a>
+</div>
+
+{% endblock %}

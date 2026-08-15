@@ -1,0 +1,30 @@
+{% extends 'store/base.html' %}
+{% load tz %}
+
+{% block title %}All Orders{% endblock %}
+
+{% block content %}
+
+<h1>All Orders</h1>
+
+<a href="/adminpanel/dashboard/">Back to Dashboard</a>
+
+<hr>
+
+{% for order in orders %}
+    <div style="background:#fff; padding:16px; border-radius:8px; margin-bottom:14px;">
+        <h3>Order #{{ order.order_id }} - {{ order.order_status }}</h3>
+        <p>Customer ID: {{ order.customer_id }} | Total: {{ order.total_amount }} | Date: {{ order.order_date|localtime|date:"N j, Y, P" }}</p>
+        <h4>Items:</h4>
+        <ul>
+        {% for item in order.items_list %}
+            <li>{{ item.product.product_title }} x {{ item.quantity }} (₹{{ item.unit_price }})</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <hr>
+{% empty %}
+    <p>No orders found.</p>
+{% endfor %}
+
+{% endblock %}

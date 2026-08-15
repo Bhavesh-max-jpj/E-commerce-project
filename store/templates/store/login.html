@@ -1,53 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Customer Login</title>
+{% extends 'store/base.html' %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-        }
+{% block title %}Customer Login{% endblock %}
 
-        .container {
-            width: 400px;
-            margin: 80px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-        }
+{% block content %}
 
-        h1 {
-            text-align: center;
-        }
+<style>
+    .auth-box{ width:420px; margin:40px auto; background:#fff; padding:30px; border-radius:8px }
+    .error{ color:red; text-align:center }
+    .auth-box form{ display:flex; flex-direction:column; gap:12px }
+    .form-row{ display:flex; align-items:center; gap:12px }
+    .form-row label{ width:110px; margin:0; font-weight:600 }
+    .form-row input{ flex:1; padding:8px 10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box }
+    .auth-box button{ padding:10px 14px; background:#222; color:#fff; border:none; border-radius:4px; cursor:pointer }
+</style>
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0 15px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: black;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container">
-
+<div class="auth-box">
     <h1>Customer Login</h1>
 
     {% if error %}
@@ -55,27 +22,23 @@
     {% endif %}
 
     <form method="POST">
-
         {% csrf_token %}
+        <div class="form-row">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required>
+        </div>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+        <div class="form-row">
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password" required>
+        </div>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
-
-        <button type="submit">
-            Login
-        </button>
-
+        <div style="text-align:right; margin-top:6px;">
+            <button type="submit">Login</button>
+        </div>
     </form>
 
-    <p>
-        Don't have an account?
-        <a href="/register/">Register</a>
-    </p>
-
+    <p>Don't have an account? <a href="/register/">Register</a></p>
 </div>
 
-</body>
-</html>
+{% endblock %}

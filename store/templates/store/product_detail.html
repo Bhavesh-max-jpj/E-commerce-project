@@ -1,127 +1,80 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.product_title }}</title>
+{% extends 'store/base.html' %}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-        }
+{% block title %}{{ product.product_title }} - Online Shopping{% endblock %}
 
-        .container {
-            width: 80%;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            display: flex;
-            gap: 50px;
-            border-radius: 10px;
-        }
+{% block content %}
 
-        .image-section {
-            width: 45%;
-        }
+<style>
+    .product-container{ width:80%; margin:30px auto; background:white; padding:30px; display:flex; gap:50px }
+    .image-section{ width:45% }
+    .image-section img{ width:100%; max-height:500px; object-fit:contain }
+    .details{ width:55% }
+    .price{ font-size:28px; font-weight:bold }
+    .stock{ color:green }
+    .button{ display:inline-block; margin-top:20px; padding:12px 25px; background:black; color:white; text-decoration:none }
+    .reviews { margin-top:24px }
+</style>
 
-        .image-section img {
-            width: 100%;
-            max-height: 500px;
-            object-fit: contain;
-        }
-
-        .details {
-            width: 55%;
-        }
-
-        .details h1 {
-            font-size: 30px;
-        }
-
-        .price {
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .stock {
-            color: green;
-            font-size: 18px;
-        }
-
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: black;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="container">
+<div class="product-container">
 
     <div class="image-section">
-
         {% if product.image_url %}
-            <img src="{{ product.image_url }}"
-                 alt="{{ product.product_title }}">
+            <img src="{{ product.image_url }}" alt="{{ product.product_title }}">
         {% endif %}
-
     </div>
 
     <div class="details">
-
         <h1>{{ product.product_title }}</h1>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Sub Category:</strong> {{ product.sub_category }}</p>
+        <p><strong>Product Type:</strong> {{ product.product_type }}</p>
+        <p><strong>Colour:</strong> {{ product.colour }}</p>
+        <p><strong>Usage:</strong> {{ product.usage_type }}</p>
 
-        <p>
-            <strong>Brand:</strong>
-            {{ product.brand }}
-        </p>
+        <p class="price">₹{{ product.price }}</p>
+        <p class="stock">Stock Available: {{ product.stock_quantity }}</p>
 
-        <p>
-            <strong>Category:</strong>
-            {{ product.category }}
-        </p>
-
-        <p>
-            <strong>Sub Category:</strong>
-            {{ product.sub_category }}
-        </p>
-
-        <p>
-            <strong>Product Type:</strong>
-            {{ product.product_type }}
-        </p>
-
-        <p>
-            <strong>Colour:</strong>
-            {{ product.colour }}
-        </p>
-
-        <p>
-            <strong>Usage:</strong>
-            {{ product.usage_type }}
-        </p>
-
-        <p class="price">
-            ₹{{ product.price }}
-        </p>
-
-        <p class="stock">
-            Stock Available: {{ product.stock_quantity }}
-        </p>
-
-        <a href="{% url 'add_to_cart' product.product_id %}"
-   class="button">
-    Add to Cart
-</a>
+        <a href="{% url 'add_to_cart' product.product_id %}" class="button">Add to Cart</a>
     </div>
 
 </div>
 
-</body>
-</html>
+<div class="container reviews">
+    <h2>Reviews</h2>
+    {% if reviews %}
+        {% for r in reviews %}
+            <div style="border:1px solid #ddd; padding:8px; margin-bottom:8px; background:#fff;">
+                <strong>{{ r.customer.first_name }}</strong> — Rating: {{ r.rating }}<br>
+                <small>{{ r.review_date }}</small>
+                <p>{{ r.review_text }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No reviews yet.</p>
+    {% endif %}
+
+    {% if request.session.customer_id %}
+        <h3>Write a review</h3>
+        <form method="POST" action="{% url 'submit_review' product.product_id %}">
+            {% csrf_token %}
+            <label>Rating</label>
+            <select name="rating">
+                <option>5</option>
+                <option>4</option>
+                <option>3</option>
+                <option>2</option>
+                <option>1</option>
+            </select>
+            <br>
+            <textarea name="review_text" rows="4" style="width:100%;"></textarea>
+            <br>
+            <button type="submit">Submit Review</button>
+        </form>
+    {% else %}
+        <p><a href="/login/">Log in</a> to write a review.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Product</title>
+</head>
+
+<body>
+
+<h1>Add New Product</h1>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <label>Product ID</label><br>
+    <input type="number" name="product_id" required>
+    <br><br>
+
+    <label>Product Title</label><br>
+    <input type="text" name="product_title" required>
+    <br><br>
+
+    <label>Brand</label><br>
+    <input type="text" name="brand">
+    <br><br>
+
+    <label>Gender</label><br>
+    <input type="text" name="gender">
+    <br><br>
+
+    <label>Category</label><br>
+    <input type="text" name="category">
+    <br><br>
+
+    <label>Sub Category</label><br>
+    <input type="text" name="sub_category">
+    <br><br>
+
+    <label>Product Type</label><br>
+    <input type="text" name="product_type">
+    <br><br>
+
+    <label>Colour</label><br>
+    <input type="text" name="colour">
+    <br><br>
+
+    <label>Usage Type</label><br>
+    <input type="text" name="usage_type">
+    <br><br>
+
+    <label>Price</label><br>
+    <input type="number" name="price" step="0.01">
+    <br><br>
+
+    <label>Stock Quantity</label><br>
+    <input type="number" name="stock_quantity">
+    <br><br>
+
+    <label>Image</label><br>
+    <input type="text" name="image">
+    <br><br>
+
+    <label>Image URL</label><br>
+    <input type="text" name="image_url">
+    <br><br>
+
+    <button type="submit">
+        Add Product
+    </button>
+
+</form>
+
+<br>
+
+<a href="/seller/dashboard/">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>
