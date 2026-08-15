@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+</head>
+
+<body>
+
+    <h1>My Profile</h1>
+
+    <p>
+        Customer ID: {{ customer.customer_id }}
+    </p>
+
+    <p>
+        Name:
+        {{ customer.first_name }}
+        {{ customer.last_name }}
+    </p>
+
+    <p>
+        Email: {{ customer.email }}
+    </p>
+
+    <p>
+        Phone: {{ customer.phone }}
+    </p>
+
+    <p>
+        City: {{ customer.city }}
+    </p>
+
+    <p>
+        State: {{ customer.state }}
+    </p>
+
+    <p>
+        Account Created: {{ customer.created_at }}
+    </p>
+
+    <a href="/products/">Continue Shopping</a>
+
+</body>
+</html>

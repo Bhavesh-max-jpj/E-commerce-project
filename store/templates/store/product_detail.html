@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ product.product_title }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            display: flex;
+            gap: 50px;
+            border-radius: 10px;
+        }
+
+        .image-section {
+            width: 45%;
+        }
+
+        .image-section img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        .details {
+            width: 55%;
+        }
+
+        .details h1 {
+            font-size: 30px;
+        }
+
+        .price {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stock {
+            color: green;
+            font-size: 18px;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: black;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="image-section">
+
+        {% if product.image_url %}
+            <img src="{{ product.image_url }}"
+                 alt="{{ product.product_title }}">
+        {% endif %}
+
+    </div>
+
+    <div class="details">
+
+        <h1>{{ product.product_title }}</h1>
+
+        <p>
+            <strong>Brand:</strong>
+            {{ product.brand }}
+        </p>
+
+        <p>
+            <strong>Category:</strong>
+            {{ product.category }}
+        </p>
+
+        <p>
+            <strong>Sub Category:</strong>
+            {{ product.sub_category }}
+        </p>
+
+        <p>
+            <strong>Product Type:</strong>
+            {{ product.product_type }}
+        </p>
+
+        <p>
+            <strong>Colour:</strong>
+            {{ product.colour }}
+        </p>
+
+        <p>
+            <strong>Usage:</strong>
+            {{ product.usage_type }}
+        </p>
+
+        <p class="price">
+            ₹{{ product.price }}
+        </p>
+
+        <p class="stock">
+            Stock Available: {{ product.stock_quantity }}
+        </p>
+
+        <a href="{% url 'add_to_cart' product.product_id %}"
+   class="button">
+    Add to Cart
+</a>
+    </div>
+
+</div>
+
+</body>
+</html>

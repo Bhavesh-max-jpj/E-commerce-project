@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            width: 70%;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .item {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Checkout</h1>
+
+    <h2>Order Summary</h2>
+
+    {% for item in cart_items %}
+
+    <div class="item">
+
+        <strong>
+            {{ item.product.product_title }}
+        </strong>
+
+        <p>
+            Quantity: {{ item.quantity }}
+        </p>
+
+        <p>
+            Price: ₹{{ item.product.price }}
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+    <p class="total">
+        Total: ₹{{ total }}
+    </p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <h2>Shipping Address</h2>
+
+        <textarea
+            name="shipping_addr"
+            placeholder="Enter your complete shipping address"
+            required></textarea>
+
+        <br>
+
+        <button type="submit">
+            Place Order
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

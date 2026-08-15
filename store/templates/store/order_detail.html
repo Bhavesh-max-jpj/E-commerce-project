@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            width: 75%;
+            margin: 40px auto;
+        }
+
+        .box {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .item {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Order #{{ order.order_id }}</h1>
+
+    <div class="box">
+
+        <p>
+            <strong>Order Date:</strong>
+            {{ order.order_date }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ order.order_status }}
+        </p>
+
+        <p>
+            <strong>Shipping Address:</strong>
+            {{ order.shipping_addr }}
+        </p>
+
+        <p>
+            <strong>Delivery Date:</strong>
+            {{ order.delivery_date|default:"Not delivered yet" }}
+        </p>
+
+    </div>
+
+    <div class="box">
+
+        <h2>Products</h2>
+
+        {% for item in items %}
+
+        <div class="item">
+
+            <h3>
+                {{ item.product.product_title }}
+            </h3>
+
+            <p>
+                Product ID: {{ item.product.product_id }}
+            </p>
+
+            <p>
+                Quantity: {{ item.quantity }}
+            </p>
+
+            <p>
+                Unit Price: ₹{{ item.unit_price }}
+            </p>
+
+            <p>
+                Subtotal: ₹{{ item.subtotal }}
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+        <p class="total">
+            Total: ₹{{ order.total_amount }}
+        </p>
+
+    </div>
+
+    <a href="/orders/" class="button">
+        Back to My Orders
+    </a>
+
+</div>
+
+</body>
+</html>
