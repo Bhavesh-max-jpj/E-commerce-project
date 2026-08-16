@@ -13,6 +13,10 @@
 
 <h1>Products</h1>
 
+{% if error %}
+<p style="color:#b30000; margin-bottom:16px;">{{ error }}</p>
+{% endif %}
+
 <div class="products">
 
     {% for product in products %}

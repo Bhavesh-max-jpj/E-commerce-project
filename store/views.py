@@ -1,17 +1,29 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Products, Customers, Cart, Orders, OrderItems, Sellers, Reviews, Payments, Admin
+from .models import Products, Customers, Cart, Orders, OrderItems, Sellers, Reviews, Payments, Admin,UserSessions,ProductViews,CartEvents,FunnelEvents
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template import RequestContext
+from django.db import IntegrityError
 
 
 
 def products(request):
     products = Products.objects.all()
 
-    return render(request, 'store/products.html', {'products': products})
+    error = None
+    if request.GET.get('error') == 'notfound':
+        error = 'Product not found. Please choose another item.'
+
+    return render(
+        request,
+        'store/products.html',
+        {
+            'products': products,
+            'error': error
+        }
+    )
 
 
 def index(request):
@@ -38,14 +50,45 @@ def orders_view(request):
     )
 
 def product_detail(request, product_id):
-    product = get_object_or_404(
-        Products,
+    product = Products.objects.filter(
         product_id=product_id
-    )
+    ).first()
+
+    if not product:
+        return redirect('/products/?error=notfound')
+
+    # Record product view
+    if 'customer_id' in request.session and 'user_session_id' in request.session:
+        try:
+            # Product_Views
+            ProductViews.objects.create(
+                customer_id=request.session['customer_id'],
+                product_id=product_id,
+                session_id=request.session['user_session_id'],
+                view_timestamp=timezone.now()
+            )
+
+            # Funnel_Events - VIEW
+            FunnelEvents.objects.create(
+                customer_id=request.session['customer_id'],
+                session_id=request.session['user_session_id'],
+                product_id=product_id,
+                event_stage='VIEW',
+                event_timestamp=timezone.now()
+            )
+
+        except Exception:
+            pass
 
     reviews = []
     try:
-        reviews = Reviews.objects.filter(product_id=product_id).select_related('customer').order_by('-review_date')
+        reviews = Reviews.objects.filter(
+            product_id=product_id
+        ).select_related(
+            'customer'
+        ).order_by(
+            '-review_date'
+        )
     except Exception:
         reviews = []
 
@@ -57,8 +100,6 @@ def product_detail(request, product_id):
             'reviews': reviews
         }
     )
-
-
 def submit_review(request, product_id):
     if request.method != 'POST':
         return redirect('product_detail', product_id=product_id)
@@ -85,14 +126,21 @@ def submit_review(request, product_id):
 def register(request):
     if request.method == 'POST':
 
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email = request.POST['email']
+        first_name = request.POST['first_name'].strip()
+        last_name = request.POST['last_name'].strip()
+        email = request.POST['email'].strip().lower()
         password = request.POST['password']
         phone = request.POST.get('phone')
         gender = request.POST.get('gender')
         city = request.POST.get('city')
         state = request.POST.get('state')
+
+        if Customers.objects.filter(email__iexact=email).exists():
+            return render(
+                request,
+                'store/register.html',
+                {'error': 'An account with this email already exists. Please log in.'}
+            )
 
         # create or update Django User (for auth) and store hashed password in Customers
         user, created = User.objects.get_or_create(username=email, defaults={
@@ -114,16 +162,23 @@ def register(request):
                 user.set_password(password)
                 user.save()
 
-        Customers.objects.create(
-            first_name=first_name,
-            last_name=last_name,
-            email=email,
-            password=user.password,
-            phone=phone,
-            gender=gender,
-            city=city,
-            state=state
-        )
+        try:
+            Customers.objects.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                password=user.password,
+                phone=phone,
+                gender=gender,
+                city=city,
+                state=state
+            )
+        except IntegrityError:
+            return render(
+                request,
+                'store/register.html',
+                {'error': 'An account with this email already exists. Please log in.'}
+            )
 
         return redirect('/login/')
 
@@ -177,39 +232,80 @@ def login_view(request):
 
         # Prefer Django auth
         user = authenticate(request, username=email, password=password)
+
         if user is not None:
             auth_login(request, user)
+
             try:
                 customer = Customers.objects.get(email=email)
+
                 request.session['customer_id'] = customer.customer_id
                 request.session['customer_name'] = customer.first_name
+
+                # CREATE USER SESSION
+                user_session = UserSessions.objects.create(
+                    customer=customer,
+                    device_type='Desktop'
+                )
+
+                request.session['user_session_id'] = user_session.session_id
+
             except Customers.DoesNotExist:
                 pass
 
             return redirect('/products/')
 
-        # Fallback: if legacy plaintext stored in Customers, migrate to Django User
+        # Fallback: legacy plaintext password
         try:
             customer = Customers.objects.get(email=email)
+
             if customer.password == password:
-                # create Django user and migrate
-                u, created = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': customer.first_name, 'last_name': customer.last_name})
+
+                # Create Django user
+                u, created = User.objects.get_or_create(
+                    username=email,
+                    defaults={
+                        'email': email,
+                        'first_name': customer.first_name,
+                        'last_name': customer.last_name
+                    }
+                )
+
                 u.set_password(password)
                 u.save()
 
-                # update stored password to hashed
+                # Update stored password
                 customer.password = u.password
                 customer.save()
 
                 auth_login(request, u)
+
                 request.session['customer_id'] = customer.customer_id
                 request.session['customer_name'] = customer.first_name
 
+                # CREATE USER SESSION
+                user_session = UserSessions.objects.create(
+                    customer=customer,
+                    device_type='Desktop'
+                )
+
+                request.session['user_session_id'] = user_session.session_id
+
                 return redirect('/products/')
+
             else:
-                return render(request, 'store/login.html', {'error': 'Incorrect password'})
+                return render(
+                    request,
+                    'store/login.html',
+                    {'error': 'Incorrect password'}
+                )
+
         except Customers.DoesNotExist:
-            return render(request, 'store/login.html', {'error': 'Customer does not exist'})
+            return render(
+                request,
+                'store/login.html',
+                {'error': 'Customer does not exist'}
+            )
 
     return render(request, 'store/login.html')
 def add_to_cart(request, product_id):
@@ -234,12 +330,35 @@ def add_to_cart(request, product_id):
     if cart_item:
         cart_item.quantity += 1
         cart_item.save()
+
     else:
-        Cart.objects.create(
+        cart_item = Cart.objects.create(
             customer=customer,
             product=product,
             quantity=1
         )
+
+    # Cart_Events
+    try:
+        CartEvents.objects.create(
+            customer_id=customer_id,
+            product_id=product_id,
+            cart_id=cart_item.cart_id,
+            event_type='ADD',
+            event_timestamp=timezone.now()
+        )
+
+        # Funnel_Events
+        FunnelEvents.objects.create(
+            customer_id=customer_id,
+            session_id=request.session['user_session_id'],
+            product_id=product_id,
+            event_stage='CART',
+            event_timestamp=timezone.now()
+        )
+
+    except Exception:
+        pass
 
     return redirect('/cart/')
 def increase_cart(request, cart_id):
@@ -253,6 +372,17 @@ def increase_cart(request, cart_id):
 
     cart_item.quantity += 1
     cart_item.save()
+
+    try:
+        CartEvents.objects.create(
+            customer_id=request.session['customer_id'],
+            product_id=cart_item.product_id,
+            cart_id=cart_item.cart_id,
+            event_type='INCREASE',
+            event_timestamp=timezone.now()
+        )
+    except Exception:
+        pass
 
     return redirect('/cart/')
 
@@ -270,6 +400,17 @@ def decrease_cart(request, cart_id):
         cart_item.quantity -= 1
         cart_item.save()
 
+        try:
+            CartEvents.objects.create(
+                customer_id=request.session['customer_id'],
+                product_id=cart_item.product_id,
+                cart_id=cart_item.cart_id,
+                event_type='DECREASE',
+                event_timestamp=timezone.now()
+            )
+        except Exception:
+            pass
+
     return redirect('/cart/')
 
 
@@ -281,6 +422,17 @@ def remove_from_cart(request, cart_id):
         cart_id=cart_id,
         customer_id=request.session['customer_id']
     )
+
+    try:
+        CartEvents.objects.create(
+            customer_id=request.session['customer_id'],
+            product_id=cart_item.product_id,
+            cart_id=cart_item.cart_id,
+            event_type='REMOVE',
+            event_timestamp=timezone.now()
+        )
+    except Exception:
+        pass
 
     cart_item.delete()
 
@@ -307,6 +459,23 @@ def checkout(request):
     if request.method == 'POST':
         shipping_addr = request.POST['shipping_addr']
 
+        cart_items_list = list(cart_items)
+        cart_ids = [item.cart_id for item in cart_items_list]
+        user_session_id = request.session.get('user_session_id')
+
+        for item in cart_items_list:
+            try:
+                if user_session_id:
+                    FunnelEvents.objects.create(
+                        customer_id=customer_id,
+                        session_id=user_session_id,
+                        product_id=item.product_id,
+                        event_stage='CHECKOUT',
+                        event_timestamp=timezone.now()
+                    )
+            except Exception:
+                pass
+
         order = Orders.objects.create(
             customer_id=customer_id,
             order_date=timezone.now(),
@@ -315,7 +484,7 @@ def checkout(request):
             shipping_addr=shipping_addr
         )
 
-        for item in cart_items:
+        for item in cart_items_list:
             OrderItems.objects.create(
                 order=order,
                 product=item.product,
@@ -323,6 +492,26 @@ def checkout(request):
                 unit_price=item.product.price,
                 subtotal=item.product.price * item.quantity
             )
+
+            try:
+                if user_session_id:
+                    FunnelEvents.objects.create(
+                        customer_id=customer_id,
+                        session_id=user_session_id,
+                        product_id=item.product_id,
+                        event_stage='ORDER',
+                        event_timestamp=timezone.now(),
+                        order_id=order.order_id
+                    )
+            except Exception:
+                pass
+
+        # cart_events has FK to cart (RESTRICT), so remove dependent rows first.
+        try:
+            if cart_ids:
+                CartEvents.objects.filter(cart_id__in=cart_ids).delete()
+        except Exception:
+            pass
 
         cart_items.delete()
 

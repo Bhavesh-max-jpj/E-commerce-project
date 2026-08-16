@@ -45,6 +45,12 @@
 
     <h1>Create Account</h1>
 
+    {% if error %}
+    <p style="color: #b30000; margin-bottom: 12px;">
+        {{ error }}
+    </p>
+    {% endif %}
+
     <form method="POST">
 
         {% csrf_token %}

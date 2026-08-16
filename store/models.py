@@ -128,3 +128,116 @@ class Sellers(models.Model):
     class Meta:
         managed = False
         db_table = 'sellers'
+class UserSessions(models.Model):
+    session_id = models.AutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        'Customers',
+        models.DO_NOTHING,
+        db_column='customer_id'
+    )
+
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(blank=True, null=True)
+    device_type = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'user_sessions'
+class ProductViews(models.Model):
+    view_id = models.AutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        'Customers',
+        models.DO_NOTHING,
+        db_column='customer_id'
+    )
+
+    product = models.ForeignKey(
+        'Products',
+        models.DO_NOTHING,
+        db_column='product_id'
+    )
+
+    session = models.ForeignKey(
+        'UserSessions',
+        models.DO_NOTHING,
+        db_column='session_id'
+    )
+
+    view_timestamp = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'product_views'
+class CartEvents(models.Model):
+    event_id = models.AutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        'Customers',
+        models.DO_NOTHING,
+        db_column='customer_id'
+    )
+
+    product = models.ForeignKey(
+        'Products',
+        models.DO_NOTHING,
+        db_column='product_id'
+    )
+
+    cart = models.ForeignKey(
+        'Cart',
+        models.DO_NOTHING,
+        db_column='cart_id'
+    )
+
+    event_type = models.CharField(max_length=30)
+
+    event_timestamp = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'cart_events'
+class FunnelEvents(models.Model):
+    event_id = models.AutoField(primary_key=True)
+
+    customer = models.ForeignKey(
+        'Customers',
+        models.DO_NOTHING,
+        db_column='customer_id'
+    )
+
+    session = models.ForeignKey(
+        'UserSessions',
+        models.DO_NOTHING,
+        db_column='session_id'
+    )
+
+    product = models.ForeignKey(
+        'Products',
+        models.DO_NOTHING,
+        db_column='product_id',
+        blank=True,
+        null=True
+    )
+
+    event_stage = models.CharField(max_length=30)
+
+    event_timestamp = models.DateTimeField()
+
+    order = models.ForeignKey(
+        'Orders',
+        models.DO_NOTHING,
+        db_column='order_id',
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        managed = False
+        db_table = 'funnel_events'
+        
