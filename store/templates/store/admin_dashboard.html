@@ -1,0 +1,33 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<h1>Admin Dashboard</h1>
+
+<div style="margin-bottom: 20px;">
+    <p><strong>Customers:</strong> {{ customers_count }}</p>
+    <p><strong>Sellers:</strong> {{ sellers_count }}</p>
+    <p><strong>Products:</strong> {{ products_count }}</p>
+    <p><strong>Orders:</strong> {{ orders_count }}</p>
+</div>
+
+<h3>Management</h3>
+<ul>
+    <li><a href="/adminpanel/customers/">View Customers</a></li>
+    <li><a href="/adminpanel/sellers/">View Sellers</a></li>
+    <li><a href="/adminpanel/products/">View Products</a></li>
+    <li><a href="/adminpanel/orders/">View Orders</a></li>
+</ul>
+
+<h3>Analysis</h3>
+<ul>
+    <li><a href="/adminpanel/funnel/">Funnel Analysis</a></li>
+</ul>
+
+<p style="margin-top: 30px;">
+    <a href="/adminpanel/logout/">Logout</a>
+</p>
+
+{% endblock %}

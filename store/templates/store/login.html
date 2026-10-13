@@ -1,0 +1,110 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Customer Login{% endblock %}
+
+{% block content %}
+
+<style>
+    .auth-box {
+        width: 420px;
+        margin: 40px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 8px;
+    }
+    .error {
+        color: red;
+        text-align: center;
+    }
+    .auth-box form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .form-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .form-row label {
+        width: 110px;
+        margin: 0;
+        font-weight: 600;
+    }
+    .form-row input {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .password-wrapper {
+        position: relative;
+        flex: 1;
+    }
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 9px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #555;
+        user-select: none;
+    }
+    .auth-box button {
+        padding: 10px 14px;
+        background: #222;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="auth-box">
+    <h1>Customer Login</h1>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-row">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" required>
+        </div>
+
+        <div class="form-row">
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+                <input id="password" type="password" name="password" required>
+                <span class="toggle-password" onclick="togglePassword()">Show</span>
+            </div>
+        </div>
+
+        <div style="text-align:right; margin-top:6px;">
+            <button type="submit">Login</button>
+        </div>
+    </form>
+
+    <p>Don't have an account? <a href="/register/">Register</a></p>
+</div>
+
+<script>
+function togglePassword() {
+    const field = document.getElementById('password');
+    const toggle = document.querySelector('.toggle-password');
+
+    if (field.type === "password") {
+        field.type = "text";
+        toggle.innerText = "Hide";
+    } else {
+        field.type = "password";
+        toggle.innerText = "Show";
+    }
+}
+</script>
+
+{% endblock %}

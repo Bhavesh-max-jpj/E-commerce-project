@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
+</head>
+<body>
+
+<h1>All Products</h1>
+
+<a href="/adminpanel/dashboard/">Back to Dashboard</a>
+ | <a href="/adminpanel/product/add/">Add Product</a>
+
+<hr>
+
+{% for p in products %}
+    <div>
+        <h3>{{ p.product_title }}</h3>
+        <p>ID: {{ p.product_id }} | Seller: {{ p.seller_id }} | Price: {{ p.price }}</p>
+        <a href="/adminpanel/product/{{ p.product_id }}/edit/">Edit</a>
+        <form method="POST" action="/adminpanel/product/{{ p.product_id }}/delete/" style="display:inline; margin-left:10px;">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+    <hr>
+{% empty %}
+    <p>No products found.</p>
+{% endfor %}
+
+</body>
+</html>

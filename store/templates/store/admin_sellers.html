@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sellers</title>
+</head>
+<body>
+
+<h1>All Sellers</h1>
+
+<a href="/adminpanel/dashboard/">Back to Dashboard</a>
+
+<hr>
+
+{% for s in sellers %}
+    <div>
+        <p>{{ s.seller_id }} - {{ s.seller_name }} ({{ s.email }})</p>
+    </div>
+    <hr>
+{% empty %}
+    <p>No sellers found.</p>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Product</title>
+</head>
+
+<body>
+
+<h1>Edit Product</h1>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <label>Product ID</label><br>
+    <input type="number" name="product_id" value="{{ product.product_id }}" readonly>
+    <br><br>
+
+    <label>Product Title</label><br>
+    <input type="text" name="product_title" value="{{ product.product_title }}" required>
+    <br><br>
+
+    <label>Brand</label><br>
+    <input type="text" name="brand" value="{{ product.brand }}">
+    <br><br>
+
+    <label>Category</label><br>
+    <input type="text" name="category" value="{{ product.category }}">
+    <br><br>
+
+    <label>Colour</label><br>
+    <input type="text" name="colour" value="{{ product.colour }}">
+    <br><br>
+
+    <label>Price</label><br>
+    <input type="number" name="price" step="0.01" value="{{ product.price }}">
+    <br><br>
+
+    <label>Stock Quantity</label><br>
+    <input type="number" name="stock_quantity" value="{{ product.stock_quantity }}">
+    <br><br>
+
+    <button type="submit">Save Changes</button>
+
+</form>
+
+<br>
+
+<a href="/seller/dashboard/">Back to Dashboard</a>
+
+</body>
+</html>

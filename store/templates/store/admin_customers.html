@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customers</title>
+</head>
+<body>
+
+<h1>All Customers</h1>
+
+<a href="/adminpanel/dashboard/">Back to Dashboard</a>
+
+<hr>
+
+{% for c in customers %}
+    <div>
+        <p>{{ c.customer_id }} - {{ c.first_name }} {{ c.last_name }} ({{ c.email }})</p>
+    </div>
+    <hr>
+{% empty %}
+    <p>No customers found.</p>
+{% endfor %}
+
+</body>
+</html>

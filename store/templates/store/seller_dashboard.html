@@ -1,0 +1,43 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block content %}
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+    <h1>Seller Dashboard</h1>
+    <div>
+        <a href="/seller/product/add/">Add Product</a>
+        &nbsp;|&nbsp;
+        <a href="/seller/logout/">Logout</a>
+    </div>
+</div>
+
+<hr>
+
+{% for product in products %}
+
+    <div>
+        <h3>{{ product.product_title }}</h3>
+        <p>Product ID: {{ product.product_id }}</p>
+        <p>Brand: {{ product.brand }}</p>
+        <p>Category: {{ product.category }}</p>
+        <p>Price: ₹{{ product.price }}</p>
+        <p>Stock: {{ product.stock_quantity }}</p>
+
+        <a href="/seller/product/{{ product.product_id }}/edit/">Edit</a>
+        <form method="POST" action="/seller/product/{{ product.product_id }}/delete/" style="display:inline; margin-left:10px;">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>You have no products yet.</p>
+
+{% endfor %}
+
+{% endblock %}

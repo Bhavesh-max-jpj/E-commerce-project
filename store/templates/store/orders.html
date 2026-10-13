@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Orders</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 40px auto;
+        }
+
+        .order {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .order h2 {
+            margin-top: 0;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: black;
+            color: white;
+            text-decoration: none;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>My Orders</h1>
+
+    {% if orders %}
+
+        {% for order in orders %}
+        <a href="{% url 'order_detail' order.order_id %}"
+   class="button">
+    View Order
+</a>
+
+        <h3>Products</h3>
+
+{% for item in order.items_list %}
+
+<div class="item">
+
+    <h4>
+        {{ item.product.product_title }}
+    </h4>
+
+    <p>
+        Product ID: {{ item.product.product_id }}
+    </p>
+
+    <p>
+        Quantity: {{ item.quantity }}
+    </p>
+
+    <p>
+        Unit Price: ₹{{ item.unit_price }}
+    </p>
+
+    <p>
+        Subtotal: ₹{{ item.subtotal }}
+    </p>
+
+</div>
+
+{% endfor %}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>You haven't placed any orders yet.</p>
+
+    {% endif %}
+
+    <a href="/products/" class="button">
+        Continue Shopping
+    </a>
+
+</div>
+
+</body>
+</html>

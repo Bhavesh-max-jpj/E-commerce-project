@@ -1,0 +1,52 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Funnel Analysis{% endblock %}
+
+{% block content %}
+
+<h1>Customer Purchase Funnel Analysis</h1>
+
+<p>This page shows unique customers at each stage and conversion rate from the previous stage.</p>
+
+<table border="1" cellpadding="12" cellspacing="0" style="border-collapse: collapse; margin-top: 20px; width: 100%; max-width: 700px;">
+    <thead>
+        <tr style="background: #222; color: white;">
+            <th>Stage</th>
+            <th>Unique Customers</th>
+            <th>Conversion from Previous</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stage, count in funnel_data.items %}
+        <tr>
+            <td><strong>{{ stage }}</strong></td>
+            <td>{{ count }}</td>
+            <td>
+                {% if conversions.stage %}
+                    {{ conversions|default_if_none:"" }}
+                {% endif %}
+                {% if conversions|default_if_none:None %}
+                    {% with rate=conversions|default_if_none:None %}
+                        {% if rate %}
+                            {{ rate }}%
+                        {% else %}
+                            —
+                        {% endif %}
+                    {% endwith %}
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No funnel data available yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br><br>
+<a href="/adminpanel/dashboard/">← Back to Admin Dashboard</a>
+
+{% endblock %}

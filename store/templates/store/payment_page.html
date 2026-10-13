@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+</head>
+<body>
+
+<h1>Payment for Order #{{ order.order_id }}</h1>
+<p>Total amount: ₹{{ order.total_amount }}</p>
+
+<form method="POST" action="/payment/process/{{ order.order_id }}/">
+    {% csrf_token %}
+    <p>This is a simulated payment. Click the button to complete payment.</p>
+    <button type="submit">Pay Now (Simulated)</button>
+</form>
+
+</body>
+</html>
