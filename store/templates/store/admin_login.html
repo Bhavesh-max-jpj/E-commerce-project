@@ -1,24 +1,22 @@
 {% extends 'store/base.html' %}
-
-{% block title %}Admin Login{% endblock %}
-
+{% block title %}Admin login{% endblock %}
 {% block content %}
-
-<div style="width:400px; margin:40px auto; background:#fff; padding:20px; border-radius:8px">
-    <h1>Admin Login</h1>
-    {% if error %}
-        <p style="color:red">{{ error }}</p>
-    {% endif %}
+<div class="auth">
+  <div class="auth-card" data-tilt="5">
+    {% include 'store/_brand_mark.html' %}
+    <h1>Admin console</h1>
+    <p class="muted">Store management and funnel analytics.</p>
+    {% include 'store/_role_switch.html' with role='admin' %}
+    {% if error %}<div class="alert alert-error">{{ error }}</div>{% endif %}
     <form method="POST">
-        {% csrf_token %}
-        <label>Username</label><br>
-        <input type="text" name="username" required><br><br>
-
-        <label>Password</label><br>
-        <input type="password" name="password" required><br><br>
-
-        <button type="submit">Login</button>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+      <div class="field"><label for="username">Username</label><input id="username" type="text" name="username" autocomplete="username" required autofocus></div>
+      <div class="field"><label for="password">Password</label>
+        <div class="input-wrap"><input id="password" type="password" name="password" autocomplete="current-password" required>
+          <button type="button" class="toggle" data-toggle-password="password">Show</button></div></div>
+      <button type="submit" class="btn-primary btn-lg btn-block">Log in</button>
     </form>
+  </div>
 </div>
-
 {% endblock %}

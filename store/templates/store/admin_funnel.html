@@ -1,52 +1,16 @@
 {% extends 'store/base.html' %}
-
-{% block title %}Funnel Analysis{% endblock %}
-
+{% block title %}Funnel table{% endblock %}
 {% block content %}
-
-<h1>Customer Purchase Funnel Analysis</h1>
-
-<p>This page shows unique customers at each stage and conversion rate from the previous stage.</p>
-
-<table border="1" cellpadding="12" cellspacing="0" style="border-collapse: collapse; margin-top: 20px; width: 100%; max-width: 700px;">
-    <thead>
-        <tr style="background: #222; color: white;">
-            <th>Stage</th>
-            <th>Unique Customers</th>
-            <th>Conversion from Previous</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for stage, count in funnel_data.items %}
-        <tr>
-            <td><strong>{{ stage }}</strong></td>
-            <td>{{ count }}</td>
-            <td>
-                {% if conversions.stage %}
-                    {{ conversions|default_if_none:"" }}
-                {% endif %}
-                {% if conversions|default_if_none:None %}
-                    {% with rate=conversions|default_if_none:None %}
-                        {% if rate %}
-                            {{ rate }}%
-                        {% else %}
-                            —
-                        {% endif %}
-                    {% endwith %}
-                {% else %}
-                    —
-                {% endif %}
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No funnel data available yet.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<br><br>
-<a href="/adminpanel/dashboard/">← Back to Admin Dashboard</a>
-
+{% include 'store/_admin_nav.html' %}
+<div class="page-head"><div><div class="eyebrow">All time</div><h1>Purchase funnel</h1><p>Unique customers at each stage and the share kept from the stage before.</p></div>
+<a href="/adminpanel/analytics/" class="btn btn-soft">Charts &amp; date range →</a></div>
+<p class="note muted" style="font-size:.88rem;margin:-6px 0 14px">Cumulative funnel: a customer who reached a later stage also counts in every earlier one (you can’t pay without viewing and carting). Reviews are counted separately.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Stage</th><th class="num">Customers</th><th style="width:40%"></th><th class="num">From previous</th></tr></thead>
+  <tbody>{% for row in rows %}
+    <tr><td><b>{{ row.stage }}</b></td><td class="num">{{ row.count }}</td>
+      <td><div style="height:10px;border-radius:0 6px 6px 0;background:var(--grad);width:{{ row.width }}%;max-width:100%"></div></td>
+      <td class="num">{% if row.rate is not None %}{{ row.rate }}%{% else %}&mdash;{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="4" class="muted">No funnel data yet.</td></tr>{% endfor %}</tbody>
+</table></div>
 {% endblock %}

@@ -55,6 +55,10 @@ from store.views import (
     admin_product_funnel,
     customer_logout,
     buy_now,
+    admin_analytics,
+    product_image,
+    admin_update_order_status,
+    cancel_order,
 )
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -164,4 +168,8 @@ path('adminpanel/funnel/', admin_funnel_analysis, name='admin_funnel'),
 path('adminpanel/funnel/product/<int:product_id>/', admin_product_funnel, name='admin_product_funnel'),
 path('logout/', customer_logout, name='customer_logout'),
 path('buy-now/<int:product_id>/', buy_now, name='buy_now'),
-]
+path('adminpanel/analytics/', admin_analytics, name='admin_analytics'),
+path('product-image/<int:product_id>/', product_image, name='product_image'),
+path('adminpanel/order/<int:order_id>/status/', admin_update_order_status, name='admin_update_order_status'),
+path('order/<int:order_id>/cancel/', cancel_order, name='cancel_order'),
+]

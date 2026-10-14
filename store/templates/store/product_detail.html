@@ -1,128 +1,94 @@
 {% extends 'store/base.html' %}
-
-{% block title %}{{ product.product_title }} - Online Shopping{% endblock %}
-
+{% block title %}{{ product.product_title }}{% endblock %}
 {% block content %}
+<a href="/products/" class="btn btn-ghost btn-sm" style="margin-bottom:18px">← Continue shopping</a>
 
-<style>
-    .product-container {
-        display: flex;
-        gap: 40px;
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-    }
-    .image-section {
-        width: 40%;
-    }
-    .image-section img {
-        width: 100%;
-        max-height: 450px;
-        object-fit: contain;
-    }
-    .details {
-        width: 60%;
-    }
-    .price {
-        font-size: 28px;
-        font-weight: bold;
-        margin: 15px 0;
-    }
-    .btn {
-        display: inline-block;
-        padding: 12px 22px;
-        margin-right: 12px;
-        margin-top: 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: 500;
-    }
-    .btn-cart {
-        background: #222;
-        color: white;
-    }
-    .btn-order {
-        background: #e67e22;
-        color: white;
-    }
-    .btn-back {
-        background: #eee;
-        color: #222;
-        margin-bottom: 20px;
-    }
-    .reviews {
-        margin-top: 40px;
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-    }
-</style>
+<div class="pd">
+  <div class="pd-stage">
+    <div class="pd-image" data-tilt="8">
+      <img src="{% url 'product_image' product.product_id %}" alt="{{ product.product_title }}">
+    </div>
+  </div>
 
-<!-- Back Button -->
-<a href="/products/" class="btn btn-back">← Continue Shopping</a>
+  <div>
+    <div class="row" style="margin-bottom:10px">
+      <span class="badge">{{ product.gender }} · {{ product.category }}</span>
+      {% if product.stock_quantity == 0 %}<span class="badge badge-bad badge-dot">Sold out</span>
+      {% elif product.stock_quantity and product.stock_quantity < 10 %}<span class="badge badge-warn badge-dot">Only {{ product.stock_quantity }} left</span>
+      {% else %}<span class="badge badge-good badge-dot">In stock</span>{% endif %}
+    </div>
+    <div class="p-brand">{{ product.brand }}</div>
+    <h1>{{ product.product_title }}</h1>
+    {% if avg_rating %}
+      <div class="row"><span class="stars" aria-label="{{ avg_rating }} out of 5">{% for i in "12345" %}{% if forloop.counter <= avg_rating|floatformat:0|add:0 %}★{% else %}<span class="off">★</span>{% endif %}{% endfor %}</span>
+      <span class="muted">{{ avg_rating }} · {{ reviews|length }} review{{ reviews|length|pluralize }}</span></div>
+    {% endif %}
+    <div class="price">₹{{ product.price|floatformat:"0g" }} <small>incl. taxes</small></div>
 
-<div class="product-container">
-    <div class="image-section">
-        {% if product.image_url %}
-            <img src="{{ product.image_url }}" alt="{{ product.product_title }}">
-        {% endif %}
+    <div class="specs">
+      <div class="spec"><span>Type</span><b>{{ product.product_type|default:"—" }}</b></div>
+      <div class="spec"><span>Colour</span><b>{{ product.colour|default:"—" }}</b></div>
+      <div class="spec"><span>Usage</span><b>{{ product.usage_type|default:"—" }}</b></div>
+      <div class="spec"><span>In stock</span><b>{{ product.stock_quantity|default:"0" }}</b></div>
     </div>
 
-    <div class="details">
-        <h1>{{ product.product_title }}</h1>
-        <p><strong>Brand:</strong> {{ product.brand }}</p>
-        <p><strong>Category:</strong> {{ product.category }}</p>
-        <p><strong>Colour:</strong> {{ product.colour }}</p>
-        <p><strong>Stock:</strong> {{ product.stock_quantity }}</p>
-
-        <p class="price">₹{{ product.price }}</p>
-
-        <!-- Two Buttons -->
-        <a href="{% url 'add_to_cart' product.product_id %}" class="btn btn-cart">
-            Add to Cart
-        </a>
-
-        <a href="{% url 'buy_now' product.product_id %}" class="btn btn-order">
-            Place Order
-        </a>
+    {% if product.stock_quantity != 0 %}
+    <div class="row">
+      <a href="{% url 'add_to_cart' product.product_id %}" class="btn btn-primary btn-lg">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2.6l2.4 12.2a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.6-1.2L21 8H6.1"/></svg>
+        Add to cart</a>
+      <a href="{% url 'buy_now' product.product_id %}" class="btn btn-warm btn-lg">Buy now</a>
     </div>
+    {% else %}
+      <div class="alert alert-warning">This item is currently out of stock.</div>
+    {% endif %}
+    {% if not request.session.customer_id %}<p class="hint" style="margin-top:12px">You'll be asked to log in first.</p>{% endif %}
+  </div>
 </div>
 
-<!-- Reviews Section -->
-<div class="reviews">
-    <h2>Reviews</h2>
+<div class="split" style="margin-top:40px">
+  <section class="card">
+    <div class="panel-title"><h2>Reviews</h2>{% if avg_rating %}<span class="badge">★ {{ avg_rating }}</span>{% endif %}</div>
+    {% for r in reviews %}
+      <div class="review">
+        <div class="row">
+          <span class="avatar">{{ r.customer.first_name|slice:":1"|upper }}</span>
+          <div><b>{{ r.customer.first_name }}</b><br><span class="stars">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}<span class="off">★</span>{% endif %}{% endfor %}</span></div>
+          <span class="spacer"></span><span class="muted" style="font-size:.85rem">{{ r.review_date|date:"d M Y" }}</span>
+        </div>
+        {% if r.review_text %}<p style="margin:10px 0 0">{{ r.review_text }}</p>{% endif %}
+      </div>
+    {% empty %}
+      <p class="muted">No reviews yet. Be the first to share your thoughts.</p>
+    {% endfor %}
+  </section>
 
-    {% if reviews %}
-        {% for r in reviews %}
-            <div style="border-bottom: 1px solid #eee; padding: 12px 0;">
-                <strong>{{ r.customer.first_name }}</strong> — Rating: {{ r.rating }}/5
-                <p>{{ r.review_text }}</p>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No reviews yet.</p>
-    {% endif %}
-
+  <aside class="card">
+    <h3>Write a review</h3>
     {% if request.session.customer_id %}
-        <h3>Write a Review</h3>
-        <form method="POST" action="{% url 'submit_review' product.product_id %}">
-            {% csrf_token %}
-            <label>Rating:</label>
-            <select name="rating">
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-                <option value="1">1</option>
-            </select>
-            <br><br>
-            <textarea name="review_text" rows="3" style="width:100%;" placeholder="Write your review..."></textarea>
-            <br><br>
-            <button type="submit">Submit Review</button>
-        </form>
+      <form method="POST" action="{% url 'submit_review' product.product_id %}">
+        {% csrf_token %}
+        <div class="field">
+          <label>Your rating</label>
+          <div class="rating-input">
+            {% for v in "54321" %}
+              <input type="radio" id="r{{ v }}" name="rating" value="{{ v }}" {% if v == "5" %}checked{% endif %}>
+              <label for="r{{ v }}" title="{{ v }} star{{ v|pluralize }}">★</label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="field"><label for="review_text">Your review</label>
+          <textarea id="review_text" name="review_text" maxlength="500" placeholder="How did it fit? How's the quality?"></textarea></div>
+        <button type="submit" class="btn-primary btn-block">Post review</button>
+      </form>
     {% else %}
-        <p><a href="/login/">Login</a> to write a review.</p>
+      <p class="muted"><a href="/login/?next={{ request.path|urlencode }}">Log in</a> to write a review.</p>
     {% endif %}
+  </aside>
 </div>
 
+{% if related %}
+<div class="page-head" style="margin-top:44px"><div><div class="eyebrow">You may also like</div><h2>More {{ product.gender }} {{ product.category|lower }}</h2></div></div>
+<div class="products">{% for p in related %}{% include 'store/_product_card.html' with p=p %}{% endfor %}</div>
+{% endif %}
 {% endblock %}

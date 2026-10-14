@@ -192,7 +192,9 @@ class CartEvents(models.Model):
     cart = models.ForeignKey(
         'Cart',
         models.DO_NOTHING,
-        db_column='cart_id'
+        db_column='cart_id',
+        blank=True,
+        null=True
     )
 
     event_type = models.CharField(max_length=30)
@@ -214,7 +216,9 @@ class FunnelEvents(models.Model):
     session = models.ForeignKey(
         'UserSessions',
         models.DO_NOTHING,
-        db_column='session_id'
+        db_column='session_id',
+        blank=True,
+        null=True
     )
 
     product = models.ForeignKey(
