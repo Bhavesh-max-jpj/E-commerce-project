@@ -86,13 +86,26 @@ except ImportError:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'shopping_funnel',
+        'NAME': os.environ.get('DB_NAME', 'shopping_funnel'),
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        # Connection reuse ("pooling" for MySQL in Django): each worker keeps its
+        # connection open for up to 5 minutes instead of reconnecting on every
+        # request, and checks it is still alive before reusing it.
+        'CONN_MAX_AGE': 300,
+        'CONN_HEALTH_CHECKS': True,
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            # Strict mode: MySQL rejects bad values instead of silently truncating
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
+# SQL-injection safety: all queries go through the Django ORM or through
+# cursor.execute(sql, params) with %s placeholders - user input is never
+# pasted into an SQL string.
 
 
 # Password validation
@@ -140,3 +153,4 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+TEST_RUNNER = 'store.test_runner.SqlScriptsTestRunner'

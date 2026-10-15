@@ -795,7 +795,7 @@ def _clean_product_form(post, need_id):
 
 
 def _delete_or_retire(request, product):
-    """Products that were ordered / reviewed can't be deleted (foreign keys keep the
+    """Products that were ordered or viewed can't be deleted (foreign keys keep the
     history). In that case take them off sale (stock 0) instead of crashing."""
     try:
         with transaction.atomic():
@@ -804,7 +804,7 @@ def _delete_or_retire(request, product):
     except IntegrityError:
         product.stock_quantity = 0
         product.save(update_fields=['stock_quantity'])
-        messages.warning(request, f'"{product.product_title}" has order or review history, so it was '
+        messages.warning(request, f'"{product.product_title}" has order or view history, so it was '
                                   f'taken off sale (stock set to 0) instead of deleted.')
 
 
@@ -1097,7 +1097,7 @@ def admin_funnel_analysis(request):
     if 'admin_id' not in request.session:
         return _to_login(request, '/adminpanel/login/')
 
-    # Cumulative funnel from the database view (sql/06_cumulative_funnel.sql):
+    # Cumulative funnel from the database view (database/08_cumulative_funnel.sql):
     # a customer who reached a later stage also counts in every earlier one.
     summary = _rows("SELECT stage, customers, pct_from_previous FROM vw_funnel_summary ORDER BY stage_order")
     top = summary[0]['customers'] if summary else 0
@@ -1193,7 +1193,7 @@ def buy_now(request, product_id):
 
 # ---------------------------------------------------------------------
 # Admin analytics page: reads the SQL views and stored procedures
-# (sql/03_views_procedures.sql, sql/05_device_view.sql)
+# (database/05_views_procedures.sql, database/07_device_view.sql, database/08_cumulative_funnel.sql)
 # ---------------------------------------------------------------------
 from datetime import date, timedelta
 from django.db import connection
@@ -1324,7 +1324,10 @@ def admin_update_order_status(request, order_id):
                 order.delivery_date = timezone.now()
             order.save()
             messages.success(request, f'Order #{order_id} marked {new}.')
-    return redirect(request.POST.get('back') or '/adminpanel/orders/')
+    back = request.POST.get('back', '')
+    if not url_has_allowed_host_and_scheme(back, allowed_hosts={request.get_host()}):
+        back = '/adminpanel/orders/'          # never redirect to another site
+    return redirect(back)
 
 
 def cancel_order(request, order_id):
